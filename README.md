@@ -24,6 +24,7 @@ To test if you've got it set up right, the following arduino sketch should send
 data to the serial terminal that should be readable by the gui.  In particular
 it should look as if there is an object 2000mm away all the way around.
 
+```
 int i = 0;
 int inc = 1;
 
@@ -43,5 +44,6 @@ void loop() {
     Serial.print(",");
     Serial.println(2000);
 }
+```
 
 This was adapted from http://howtomechatronics.com/arduino-radar/.
