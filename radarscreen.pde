@@ -1,9 +1,8 @@
-
 import processing.serial.*; // imports library for serial communication
 import java.awt.event.KeyEvent; // imports library for reading the data from the serial port
 import java.io.IOException;
 
-int MAX_RANGE = 5000;  //maximum range to record, in mm
+int MAX_RANGE = 300;  //maximum range to record, in mm
 
 Serial myPort; // defines Object Serial
 // defubes variables
@@ -21,7 +20,8 @@ void setup() {
 
   size (1920, 1080);
   smooth();
-  String portName = Serial.list()[0]; //port that arduino is using (you may have to change this to Serial.list()[1] or Serial.list()[2], etc, if you have other serial connections open.
+  String portName = Serial.list()[1]; //port that arduino is using (you may have to change this to Serial.list()[1] or Serial.list()[2], etc, if you have other serial connections open.
+  print(portName);
   myPort = new Serial(this, portName, 9600);
   //myPort = new Serial(this,"COM6", 9600); // starts the serial communication
   myPort.bufferUntil('\n'); // reads the data from the serial port up to the character '.'. So actually it reads this: angle,distance.
@@ -47,23 +47,28 @@ void draw() {
 }
 
 void serialEvent (Serial myPort) { // starts reading data from the Serial Port
-  // reads the data from the Serial Port up to the character '.' and puts it into the String variable "data".
-  data = myPort.readStringUntil('\n');
-
-  if (data == null)
-    return;
-
-  data = data.substring(0, data.length()-1);
-
-  index1 = data.indexOf(","); // find the character ',' and puts it into the variable "index1"
-  angle= data.substring(0, index1); // read the data from position "0" to position of the variable index1 or thats the value of the angle the Arduino Board sent into the Serial Port
-  distance= data.substring(index1+1, data.length()); // read the data from position "index1" to the end of the data pr thats the value of the distance
-
-  // converts the String variables into Integer
-
-  iAngle = Integer.parseInt(angle.trim());
-  iDistance = Integer.parseInt(distance.trim());
-  redraw();
+  try {
+    // reads the data from the Serial Port up to the character '.' and puts it into the String variable "data".
+    data = myPort.readStringUntil('\n');
+  
+    if (data == null || data.length() <= 0)
+      return;
+  
+    data = data.substring(0, data.length()-1);
+    //print(data + "\n");
+    index1 = data.indexOf(","); // find the character ',' and puts it into the variable "index1"
+    angle= data.substring(0, index1); // read the data from position "0" to position of the variable index1 or thats the value of the angle the Arduino Board sent into the Serial Port
+    distance= data.substring(index1+1, data.length()); // read the data from position "index1" to the end of the data pr thats the value of the distance
+  
+    // converts the String variables into Integer
+  
+    iAngle = Integer.parseInt(angle.trim());
+    iDistance = Integer.parseInt(distance.trim());
+    redraw();
+  }
+  catch(RuntimeException e) {
+    e.printStackTrace();
+  }
 }
 
 void drawRadar() {
